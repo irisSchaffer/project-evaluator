@@ -8,6 +8,19 @@ const customProperties = {
 	swatchBody: 'var(--white)',
 	swatchFont: 'var(--darkGray)',
 	swatchPrimaryHighlight: '#FBCAC8',
+
+	successLight: 'rgb(209, 244, 226)',
+	success: 'rgb(5, 196, 107)',
+	successDark: 'rgb(19, 142, 84)',
+
+	failureLight: 'rgb(255, 223, 222)',
+	failure: 'rgb(255, 94, 87)',
+	failureDark: 'rgb(212, 36, 26)',
+
+	warningLight: 'rgb(255, 243, 196)',
+	warning: 'rgb(255, 211, 42)',
+	warningDark: 'rgb(232, 185, 0)',
+
 	widthMobile: 767,
 	widthTablet: 991,
 	widthDesktop: 1199
