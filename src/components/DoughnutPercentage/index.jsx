@@ -7,13 +7,10 @@ export default ({ percentage, change = null, title }) => {
 	const color =
 		percentage <= 0.33
 			? 'failure'
-			: percentage <= 0.67
-				? 'warning'
-				: 'success'
+			: percentage <= 0.67 ? 'warning' : 'success'
 
 	const absChange = Math.abs(change * 100)
 	const percent = percentage * 100
-	const drawnPercent = percent - change > 0 ? absChange : 0
 
 	return (
 		<figure className={styles.root}>
@@ -54,7 +51,11 @@ export default ({ percentage, change = null, title }) => {
 							cy="21"
 							r="15.91549430918954"
 							fill="transparent"
-							stroke={change > 0 ? customProperties[`${color}Dark`] : customProperties[`${color}Light`]}
+							stroke={
+								change > 0
+									? customProperties[`${color}Dark`]
+									: customProperties[`${color}Light`]
+							}
 							strokeWidth="3"
 							strokeDasharray={`${absChange} ${100 - absChange}`}
 							strokeDashoffset={
@@ -63,11 +64,10 @@ export default ({ percentage, change = null, title }) => {
 						/>
 					)}
 				</svg>
-				<span className={styles.percent}>
-					{percentage * 100}%
-				</span>
+				<span className={styles.percent}>{Math.round(percent)}%</span>
 				<span className={styles.change}>
-					{change && `${change > 0 ? '+' : ''}${Math.round(change * 100)}%`}
+					{change &&
+						`${change > 0 ? '+' : ''}${Math.round(change * 100)}%`}
 				</span>
 			</div>
 			<figcaption className={styles.caption}>{title}</figcaption>
