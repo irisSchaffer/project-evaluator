@@ -1,7 +1,12 @@
 .root {
 	width: 100%;
+	min-width: 0;
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	grid-column-gap: 20px;
+	grid-template-columns: repeat(2, 1fr);
+	grid-gap: 20px 20px;
 	justify-items: center;
+
+	@media (--tabletUp) {
+		grid-template-columns: repeat(3, 1fr);
+	}
 }

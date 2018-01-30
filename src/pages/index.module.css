@@ -1,7 +1,38 @@
-.statistics {
-	width: 100%;
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	grid-column-gap: 20px;
-	justify-items: center;
+.root {
+	margin: 0 auto;
+	padding: 0 20px;
+
+	@media (--tabletUp) {
+		width: 1200px;
+		max-width: 70vw;
+	}
+}
+
+.form {
+	font-size: 1rem;
+
+	& > * + * {
+		margin-left: 2rem;
+	}
+
+	& label {
+		& span {
+			display: inline-block;
+			margin-right: 1rem;
+		}
+	}
+}
+
+.section {
+	height: 100vh;
+	position: relative;
+
+	& > * {
+		width: 100%;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		text-align: center;
+	}
 }

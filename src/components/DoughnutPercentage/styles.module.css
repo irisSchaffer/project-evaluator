@@ -11,12 +11,16 @@
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	font-size: 1em;
+	font-size: 5vw;
 	transform: translate(-50%, -50%);
 	text-align: center;
 
 	@media (--tabletUp) {
-		font-size: 2em;
+		font-size: 3vw;
+	}
+
+	@media (--desktopBig) {
+		font-size: 2.2rem;
 	}
 }
 
@@ -36,5 +40,19 @@
 }
 
 .caption {
+	margin-top: -.7em;
 	text-align: center;
+	font-size: 4vw;
+
+	@media (--tabletUp) {
+		font-size: 2vw;
+	}
+
+	@media (--desktopBig) {
+		font-size: 1.5rem;
+	}
+}
+
+.doughnutRing {
+	stroke: rgba(0, 0, 0, 0.05);
 }

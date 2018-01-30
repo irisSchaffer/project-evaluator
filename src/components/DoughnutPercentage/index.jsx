@@ -3,7 +3,7 @@ import React from 'react'
 import { customProperties } from '../../../data/variables'
 import styles from './styles.module.css'
 
-export default ({ percentage, change = null, title }) => {
+export default ({ percentage, title, change = null, description }) => {
 	const color =
 		percentage <= 0.33
 			? 'failure'
@@ -17,19 +17,11 @@ export default ({ percentage, change = null, title }) => {
 			<div className={styles.chart}>
 				<svg viewBox="0 0 42 42">
 					<circle
-						className={styles.doughnutHole}
-						cx="21"
-						cy="21"
-						r="15.91549430918954"
-						fill="#fff"
-					/>
-					<circle
 						className={styles.doughnutRing}
 						cx="21"
 						cy="21"
 						r="15.91549430918954"
 						fill="transparent"
-						stroke={customProperties.lightGray}
 						strokeWidth="3"
 					/>
 
@@ -64,13 +56,13 @@ export default ({ percentage, change = null, title }) => {
 						/>
 					)}
 				</svg>
-				<span className={styles.percent}>{Math.round(percent)}%</span>
+				<span className={styles.percent}>{title || `${Math.round(percent)}%`}</span>
 				<span className={styles.change}>
 					{change &&
 						`${change > 0 ? '+' : ''}${Math.round(change * 100)}%`}
 				</span>
 			</div>
-			<figcaption className={styles.caption}>{title}</figcaption>
+			<figcaption className={styles.caption}>{description}</figcaption>
 		</figure>
 	)
 }
