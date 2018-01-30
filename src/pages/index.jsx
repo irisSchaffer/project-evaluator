@@ -1,113 +1,139 @@
 import React from 'react'
 
-import DoughnutPercentage from '../components/DoughnutPercentage'
-import styles from './index.module.css'
+import DoughnutStats from '../components/DoughnutStats'
+import { addMonths } from '../utils/date'
 
-export default ({ data }) => (
-	<div>
-		<section>
-			<h2>Overall statistics</h2>
-			<p>
-				Total responses:{' '}
-				{data.allGoogleSheetFormResponses1Row.edges.length}
-			</p>
-			<p>
-				Responses last month:{' '}
-				{data.allGoogleSheetFormResponses1Row.edges.length}
-			</p>
-			<div className={styles.statistics}>
-				<DoughnutPercentage
-					percentage={0.15}
-					change={-0.15}
-					title="Overall Enjoyment"
-				/>
-				<DoughnutPercentage
-					percentage={0.45}
-					change={-0.1}
-					title="Avg. Learning Rate"
-				/>
-				<DoughnutPercentage
-					change={-0.05}
-					percentage={0.9}
-					title="Avg. Proudness"
-				/>
-			</div>
-		</section>
+const average = (acc, val, i) => (acc * i + val) / (i + 1)
 
-		<section>
-			<h2>Department specific statistics</h2>
+const calcResults = results => fields => (filter = () => true) => {
+	const filteredResults = results.filter(filter)
 
-			<h3>Design</h3>
-			<p>
-				Total responses:{' '}
-				{data.allGoogleSheetFormResponses1Row.edges.length}
-			</p>
-			<p>
-				Responses last month:{' '}
-				{data.allGoogleSheetFormResponses1Row.edges.length}
-			</p>
-			<div className={styles.statistics}>
-				<DoughnutPercentage
-					percentage={0.24}
-					change={0.15}
-					title="Overall Enjoyment"
-				/>
-				<DoughnutPercentage
-					percentage={0.45}
-					change={0.07}
-					title="Avg. Learning Rate"
-				/>
-				<DoughnutPercentage
-					percentage={0.9}
-					change={0.2}
-					title="Avg. Proudness"
-				/>
-			</div>
+	return fields.map(({ field, title }) => ({
+		title,
+		value: filteredResults.map(r => r[field]).reduce(average, 0) / 5
+	}))
+}
 
-			<h3>Development</h3>
-			<p>
-				Total responses:{' '}
-				{data.allGoogleSheetFormResponses1Row.edges.length}
-			</p>
-			<p>
-				Responses last month:{' '}
-				{data.allGoogleSheetFormResponses1Row.edges.length}
-			</p>
-			<div className={styles.statistics}>
-				<DoughnutPercentage
-					percentage={0.15}
-					title="Overall Enjoyment"
-				/>
-				<DoughnutPercentage
-					percentage={0.45}
-					title="Avg. Learning Rate"
-				/>
-				<DoughnutPercentage percentage={0.9} title="Avg. Proudness" />
-			</div>
+const departmentFilter = department => r => r.department === department
+const timeFilter = (start, end = new Date()) => r => r.completionDate >= start && r.completionDate <= end
 
-			<h3>Management</h3>
-			<p>
-				Total responses:{' '}
-				{data.allGoogleSheetFormResponses1Row.edges.length}
-			</p>
-			<p>
-				Responses last month:{' '}
-				{data.allGoogleSheetFormResponses1Row.edges.length}
-			</p>
-			<div className={styles.statistics}>
-				<DoughnutPercentage
-					percentage={0.15}
-					title="Overall Enjoyment"
+const combine = filters => r => filters.reduce((acc, fn) => fn(acc), r)
+const subtractMonths = months => addMonths(new Date())(0 - months)
+
+export default ({ data }) => {
+	const results = data.allGoogleSheetFormResponses1Row.edges
+		.map(e => e.node)
+		.map(result => ({
+			...result,
+			completionDate: new Date(result.completionDate)
+		}))
+
+	const getResults = calcResults(results)([
+		{
+			field: 'enjoyment',
+			title: 'Overall Enjoyment'
+		},
+		{
+			field: 'proudness',
+			title: 'Proudness'
+		},
+		{
+			field: 'innovativeness',
+			title: 'Innovativeness'
+		},
+		{
+			field: 'learned',
+			title: 'Learned'
+		},
+		{
+			field: 'visuallyAppealing',
+			title: 'Visually Appealing'
+		},
+		{
+			field: 'joyOfUse',
+			title: 'Joy Of Use'
+		}
+	])
+
+	return (
+		<div>
+			<section>
+				<h2>Overall statistics</h2>
+				<p>Total responses: {results.length}</p>
+				<p>Responses last month: {results.length}</p>
+				<DoughnutStats results={getResults()} />
+			</section>
+
+			<section>
+				<h2>Last month</h2>
+				<p>Total responses: {results.length}</p>
+				<p>Responses last month: {results.length}</p>
+				<DoughnutStats
+					results={getResults(timeFilter(subtractMonths(1)))}
 				/>
-				<DoughnutPercentage
-					percentage={0.45}
-					title="Avg. Learning Rate"
+			</section>
+			<section>
+				<h2>Last 6 months</h2>
+				<p>Total responses: {results.length}</p>
+				<p>Responses last month: {results.length}</p>
+				<DoughnutStats
+					results={getResults(timeFilter(subtractMonths(6)))}
 				/>
-				<DoughnutPercentage percentage={0.9} title="Avg. Proudness" />
-			</div>
-		</section>
-	</div>
-)
+			</section>
+			<section>
+				<h2>Last year</h2>
+				<p>Total responses: {results.length}</p>
+				<p>Responses last month: {results.length}</p>
+				<DoughnutStats
+					results={getResults(timeFilter(subtractMonths(12)))}
+				/>
+			</section>
+
+			<section>
+				<h2>Department specific statistics</h2>
+
+				<h3>Design</h3>
+				<p>
+					Total responses:{' '}
+					{data.allGoogleSheetFormResponses1Row.edges.length}
+				</p>
+				<p>
+					Responses last month:{' '}
+					{data.allGoogleSheetFormResponses1Row.edges.length}
+				</p>
+				<DoughnutStats
+					results={getResults(departmentFilter('Design'))}
+				/>
+
+				<h3>Development</h3>
+				<p>
+					Total responses:{' '}
+					{data.allGoogleSheetFormResponses1Row.edges.length}
+				</p>
+				<p>
+					Responses last month:{' '}
+					{data.allGoogleSheetFormResponses1Row.edges.length}
+				</p>
+				<DoughnutStats
+					results={getResults(departmentFilter('Development'))}
+				/>
+
+				<h3>Management</h3>
+				<p>
+					Total responses:{' '}
+					{data.allGoogleSheetFormResponses1Row.edges.length}
+				</p>
+				<p>
+					Responses last month:{' '}
+					{data.allGoogleSheetFormResponses1Row.edges.length}
+				</p>
+				<DoughnutStats
+					results={getResults(departmentFilter('Management'))}
+				/>
+			</section>
+		</div>
+	)
+}
 
 export const query = graphql`
 	query StartPageQuery {
