@@ -1,6 +1,6 @@
 import React from 'react'
 
-import DoughnutPercentage from '../DoughnutPercentage'
+import DoughnutChart from '../DoughnutChart'
 import styles from './styles.module.css'
 
 const displayNumber = num => {
@@ -11,7 +11,7 @@ const displayNumber = num => {
 export default ({ results }) => (
 	<div className={styles.root}>
 		{results.map(r => (
-			<DoughnutPercentage
+			<DoughnutChart
 				percentage={r.value / 5}
 				change={r.change}
 				description={r.title}
