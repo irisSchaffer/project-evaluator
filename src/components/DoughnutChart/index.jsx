@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { customProperties } from '../../../data/variables'
-import styles from './styles.module.css'
+import styles from './index.module.css'
 
 export default ({ percentage, title, change = null, description }) => {
 	const color =

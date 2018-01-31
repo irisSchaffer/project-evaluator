@@ -1,7 +1,7 @@
 import React from 'react'
 
 import DoughnutChart from '../DoughnutChart'
-import styles from './styles.module.css'
+import styles from './index.module.css'
 
 const displayNumber = num => {
 	const toFixed = num.toFixed(1)
@@ -13,7 +13,7 @@ export default ({ results }) => (
 		{results.map(r => (
 			<DoughnutChart
 				percentage={r.value / 5}
-				change={r.change}
+				change={r.change && r.change / 5}
 				description={r.title}
 				title={`${displayNumber(r.value)} / 5`}
 				key={r.title}

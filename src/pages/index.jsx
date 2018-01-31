@@ -1,17 +1,30 @@
 import React from 'react'
 
 import DoughnutStats from '../components/DoughnutStats'
+import Select from '../components/Select'
 import { addMonths } from '../utils/date'
 import config from '../../data/siteConfig'
 import styles from './index.module.css'
 
 const average = (acc, val, i) => (acc * i + val) / (i + 1)
 
-const calcResults = results => fields =>
-	fields.map(({ field, title }) => ({
-		title,
-		value: results.map(r => r[field]).reduce(average, 0)
-	}))
+const calcResults = (data, comparisonData) =>
+	config.shownStats
+		.map(({ field, title }) => ({
+			title,
+			field,
+			value: data.map(r => r[field]).reduce(average, 0)
+		}))
+		.map(({ field, ...result }) => {
+			const compAvg = comparisonData.map(r => r[field]).reduce(average, 0)
+			return {
+				...result,
+				change:
+					comparisonData.length === 0
+						? null
+						: result.value - compAvg
+			}
+		})
 
 const departmentFilter = department => r => r.department === department
 const timeFilter = (start, end = new Date()) => r =>
@@ -43,27 +56,32 @@ const departments = {
 const times = {
 	0: {
 		title: 'alltime',
-		filter: () => true
+		filter: () => true,
+		comparisonFilter: timeFilter(new Date(1970), subtractMonths(1))
 	},
 	1: {
 		title: '1 month',
 		date: subtractMonths(1),
-		filter: timeFilter(subtractMonths(1))
+		filter: timeFilter(subtractMonths(1)),
+		comparisonFilter: timeFilter(subtractMonths(1 * 2), subtractMonths(1))
 	},
 	3: {
 		title: '3 months',
 		date: subtractMonths(3),
-		filter: timeFilter(subtractMonths(3))
+		filter: timeFilter(subtractMonths(3)),
+		comparisonFilter: timeFilter(subtractMonths(3 * 2), subtractMonths(3))
 	},
 	6: {
 		title: '6 months',
 		date: subtractMonths(6),
-		filter: timeFilter(subtractMonths(6))
+		filter: timeFilter(subtractMonths(6)),
+		comparisonFilter: timeFilter(subtractMonths(6 * 2), subtractMonths(6))
 	},
 	12: {
 		title: '12 months',
 		date: subtractMonths(12),
-		filter: timeFilter(subtractMonths(12))
+		filter: timeFilter(subtractMonths(12)),
+		comparisonFilter: timeFilter(subtractMonths(12 * 2), subtractMonths(12))
 	}
 }
 
@@ -90,60 +108,54 @@ class StartPage extends React.Component {
 			}))
 			.filter(filter)
 
-		const results = calcResults(data)(config.shownStats)
+		const comparisonData = data.filter(time.comparisonFilter)
 
-		const resultsBefore = data.filter(
-			timeFilter(subtractMonths(this.state.time * 2))
-		)
+		const results = calcResults(data, comparisonData).map(r => ({
+			...r,
+			change: this.state.time === '0' ? 1 - r.change : r.change
+		}))
 
 		return (
-			<div className={styles.root}>
-				<section className={styles.section}>
-					<div>
-						<form className={styles.form}>
-							<label htmlFor="department">
-								<span>Department:</span>
-								<select
-									id="department"
-									value={this.state.department}
-									onChange={e =>
-										this.setState({
-											department: e.target.value
-										})
-									}
-								>
-									{Object.keys(departments).map(key => (
-										<option value={key} key={key}>
-											{departments[key].title}
-										</option>
-									))}
-								</select>
-							</label>
-							<label htmlFor="timeframe">
-								<span>Timeframe:</span>
-								<select
-									id="timeframe"
-									value={this.state.time}
-									onChange={e =>
-										this.setState({ time: e.target.value })
-									}
-								>
-									{Object.keys(times).map(key => (
-										<option value={key} key={key}>
-											{times[key].title}
-										</option>
-									))}
-								</select>
-							</label>
-						</form>
-						<DoughnutStats results={results} />
-						<p>
-							Total: {data.length} responses. Improvement
-							measured from month before.
-						</p>
-					</div>
-				</section>
-			</div>
+			<section className={styles.root}>
+				<form className={styles.form}>
+					<Select
+						className={styles.select}
+						label="Department"
+						value={this.state.department}
+						onChange={e =>
+							this.setState({ department: e.target.value })
+						}
+						options={Object.keys(departments).map(key => ({
+							label: departments[key].title,
+							value: key
+						}))}
+					/>
+					<Select
+						className={styles.select}
+						label="Timeframe"
+						value={this.state.time}
+						onChange={e => this.setState({ time: e.target.value })}
+						options={Object.keys(times).map(key => ({
+							label: times[key].title,
+							value: key
+						}))}
+					/>
+				</form>
+				<DoughnutStats results={results} />
+				<aside className={styles.notes}>
+					<ul>
+						<li>Total: {data.length} responses.</li>
+						<li>
+							Improvement measured comparing the{' '}
+							{this.state.time === '0'
+								? 'alltime average to alltime average excluding the last month.'
+								: `last ${time.title} to the ${
+									time.title
+								} before that.`}
+						</li>
+					</ul>
+				</aside>
+			</section>
 		)
 	}
 }
