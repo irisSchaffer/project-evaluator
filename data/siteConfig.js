@@ -25,5 +25,9 @@ module.exports = {
 			field: 'joyOfUse',
 			title: 'Joy Of Use'
 		}
-	]
+	],
+	defaultOptions: {
+		department : 'all',
+		time       : '0'
+	}
 }
