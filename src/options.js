@@ -27,25 +27,21 @@ export const times = {
 	},
 	1: {
 		title: '1 month',
-		date: subtractMonths(1),
 		filter: timeFilter(subtractMonths(1)),
 		comparisonFilter: timeFilter(subtractMonths(1 * 2), subtractMonths(1))
 	},
 	3: {
 		title: '3 months',
-		date: subtractMonths(3),
 		filter: timeFilter(subtractMonths(3)),
 		comparisonFilter: timeFilter(subtractMonths(3 * 2), subtractMonths(3))
 	},
 	6: {
 		title: '6 months',
-		date: subtractMonths(6),
 		filter: timeFilter(subtractMonths(6)),
 		comparisonFilter: timeFilter(subtractMonths(6 * 2), subtractMonths(6))
 	},
 	12: {
 		title: '12 months',
-		date: subtractMonths(12),
 		filter: timeFilter(subtractMonths(12)),
 		comparisonFilter: timeFilter(subtractMonths(12 * 2), subtractMonths(12))
 	}

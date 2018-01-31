@@ -2,6 +2,7 @@ import React from 'react'
 
 import { departments, times } from '../options'
 import { combine } from '../utils/filters'
+import { calculateResults } from '../utils/results'
 import config from '../../data/siteConfig'
 
 import DoughnutStats from '../components/DoughnutStats'
@@ -9,50 +10,54 @@ import Select from '../components/Select'
 
 import styles from './index.module.css'
 
-const average = (acc, val, i) => (acc * i + val) / (i + 1)
-
-const calcResults = (data, comparisonData) =>
-	config.shownStats
-		.map(({ field, title }) => ({
-			title,
-			field,
-			value: data.map(r => r[field]).reduce(average, 0)
-		}))
-		.map(({ field, ...result }) => {
-			const compAvg = comparisonData.map(r => r[field]).reduce(average, 0)
-			return {
-				...result,
-				change:
-					comparisonData.length === 0 ? null : result.value - compAvg
-			}
-		})
-
 class StartPage extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = { ...config.defaultOptions }
 	}
 
-	render() {
+	getData() {
 		const department = departments[this.state.department]
 		const time = times[this.state.time]
 
 		const filter = combine(department.filter, time.filter)
-
-		const data = this.props.data.allGoogleSheetFormResponses1Row.edges
+		return this.props.data.allGoogleSheetFormResponses1Row.edges
 			.map(e => e.node)
 			.map(result => ({
 				...result,
 				completionDate: new Date(result.completionDate)
 			}))
 			.filter(filter)
+	}
 
-		const comparisonData = data.filter(time.comparisonFilter)
+	getResults(data, comparisonData) {
+		const results = calculateResults(config.shownStats)({
+			data,
+			comparisonData
+		})
 
-		const results = calcResults(data, comparisonData).map(r => ({
+		return results.map(r => ({
 			...r,
 			change: this.state.time === '0' ? 1 - r.change : r.change
 		}))
+	}
+
+	getImprovementText() {
+		const timeSpan = times[this.state.time].title
+
+		if (this.state.time === '0') {
+			return 'Improvement measured comparing the alltime average to alltime average excluding the last month.'
+		}
+
+		return `Improvement measured comparing the last ${timeSpan} to the ${timeSpan} before that.`
+	}
+
+	render() {
+		const time = times[this.state.time]
+
+		const data = this.getData()
+		const comparisonData = data.filter(time.comparisonFilter)
+		const results = this.getResults(data, comparisonData)
 
 		return (
 			<section className={styles.root}>
@@ -84,14 +89,7 @@ class StartPage extends React.Component {
 				<aside className={styles.notes}>
 					<ul>
 						<li>Total: {data.length} responses.</li>
-						<li>
-							Improvement measured comparing the{' '}
-							{this.state.time === '0'
-								? 'alltime average to alltime average excluding the last month.'
-								: `last ${time.title} to the ${
-									time.title
-								} before that.`}
-						</li>
+						<li>{this.getImprovementText()}</li>
 					</ul>
 				</aside>
 			</section>
