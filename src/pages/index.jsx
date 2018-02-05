@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { departments, times } from '../options'
+import { departments, times, getSelectOptions } from '../options'
 import { combine } from '../utils/filters'
 import { calculateResults } from '../utils/results'
 import config from '../../data/siteConfig'
@@ -17,17 +17,12 @@ class StartPage extends React.Component {
 	}
 
 	getData() {
-		const department = departments[this.state.department]
-		const time = times[this.state.time]
-
-		const filter = combine(department.filter, time.filter)
 		return this.props.data.allGoogleSheetFormResponses1Row.edges
 			.map(e => e.node)
 			.map(result => ({
 				...result,
 				completionDate: new Date(result.completionDate)
 			}))
-			.filter(filter)
 	}
 
 	getResults(data, comparisonData) {
@@ -53,9 +48,11 @@ class StartPage extends React.Component {
 	}
 
 	render() {
+		const department = departments[this.state.department]
 		const time = times[this.state.time]
+		const filter = combine(department.filter, time.filter)
 
-		const data = this.getData()
+		const data = this.getData().filter(filter)
 		const comparisonData = data.filter(time.comparisonFilter)
 		const results = this.getResults(data, comparisonData)
 
@@ -65,24 +62,20 @@ class StartPage extends React.Component {
 					<Select
 						className={styles.select}
 						label="Department"
+						name="department"
 						value={this.state.department}
 						onChange={e =>
 							this.setState({ department: e.target.value })
 						}
-						options={Object.keys(departments).map(key => ({
-							label: departments[key].title,
-							value: key
-						}))}
+						options={getSelectOptions(departments)}
 					/>
 					<Select
 						className={styles.select}
 						label="Timeframe"
+						name="time"
 						value={this.state.time}
 						onChange={e => this.setState({ time: e.target.value })}
-						options={Object.keys(times).map(key => ({
-							label: times[key].title,
-							value: key
-						}))}
+						options={getSelectOptions(times)}
 					/>
 				</form>
 				<DoughnutStats results={results} />

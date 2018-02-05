@@ -27,7 +27,7 @@ module.exports = {
 		}
 	],
 	defaultOptions: {
-		department : 'all',
-		time       : '0'
+		department: 'all',
+		time: '0'
 	}
 }

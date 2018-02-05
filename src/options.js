@@ -1,5 +1,11 @@
 import { departmentFilter, timeFilter, subtractMonths } from './utils/filters'
 
+export const getSelectOptions = options =>
+	Object.keys(options).map(key => ({
+		label: options[key].title,
+		value: key
+	}))
+
 export const departments = {
 	all: {
 		title: 'Everyone',
