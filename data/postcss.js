@@ -13,9 +13,6 @@ module.exports = {
 					extensions: variables.customMedia
 				}
 			}
-		}),
-		require('autoprefixer')({
-			browsers: ['last 2 versions']
 		})
 	]
 }
